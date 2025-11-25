@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: e0d5557a01f4e0740bd53d6ed2ab7327
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 239419
+  packageName: Fast Food Restaurant Kit
+  packageVersion: 1.2
+  assetPath: Assets/Brick Project Studio/_BPS Basic Assets/Common/Scripts and Animations/Drawer/X
+    Axis/Drawer_Pull_X.cs
+  uploadId: 566212

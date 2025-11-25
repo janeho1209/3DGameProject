@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 26f1b36be16f30d409f9ab1a7d20a8a5
+timeCreated: 1530976527
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 239419
+  packageName: Fast Food Restaurant Kit
+  packageVersion: 1.2
+  assetPath: Assets/Brick Project Studio/_BPS Basic Assets/Common/Materials/Basic
+    Assets/BA_Wood 02.mat
+  uploadId: 566212

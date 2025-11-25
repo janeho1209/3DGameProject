@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1e8192f35a44301488ec0f072d9a16fe
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 239419
+  packageName: Fast Food Restaurant Kit
+  packageVersion: 1.2
+  assetPath: Assets/Brick Project Studio/_BPS Basic Assets/Common/Scripts and Animations/Doors/opencloseDoor.cs
+  uploadId: 566212
