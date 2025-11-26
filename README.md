@@ -4,7 +4,7 @@ A pizza shop simulator where the player is running a pizza shop. A customer will
 above their head and the player must run around the kitchen to gather the respective ingredients, placing them on the dough.
 After the order has been made, the player must pickup the pizza and hand it to the respective customer. 
 
-The goal is to complete as many orders correctly to maintain a high store rating by the end of the day. Too many failed orders/very low
+The goal is to complete as many orders correctly to maintain a high store rating by the end of the level. Too many failed orders/very low
 rating will result in a game over. 
 
 ## Gameplay Loop
@@ -32,6 +32,7 @@ After X orders:
 - Brianna Sengchan
 
 ## General Goals
+```
 Jane & Brianna - Arts/Assets
     - Counter with all possible ingredients 
     - various NPCs/customer models + speech bubbles
@@ -42,7 +43,11 @@ Aarav & Jahnavi - Coding/Gameplay
     - Player movement 
     - Picking up/putting down ingredients on dough
     - NPC movement with speech bubble
-    - Calculate order accuracy/overall rating 
+    - Calculate order accuracy/overall rating
+```
+## Possible Additions
+- Timed aspect/Day cycle
+- Coins/Capitalism for upgrades/customizables 
     
 
 
