@@ -288,8 +288,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e405fc1605e0ccf4ba5c70d9baf34d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  inHand: {fileID: 0}
-  hitbox: 2
+  inHand: {fileID: 937659645}
+  hitbox: 1.5
   pickupKey: 120
 --- !u!65 &68916611
 BoxCollider:
@@ -1350,7 +1350,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 87fd60ed424058d4ab98d47867c06277, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1421,7 +1421,7 @@ Transform:
   m_GameObject: {fileID: 937659644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.88}
+  m_LocalPosition: {x: 0, y: 0.73, z: 0.88}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1578,7 +1578,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1135196694
 MeshRenderer:
