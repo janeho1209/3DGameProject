@@ -9,28 +9,43 @@ rating will result in a game over.
 
 ## Gameplay Loop
 
-```mermaid
-flowchart TD
-    A([Start Game]) --> B([Start with assembly station + ingredients])
-    B --> C([Customer pulls up and specifies their order])
-    C --> D([Assemble order to customer's liking])
-
-    D --> E{Is the order correct?}
-    E -->|Yes| F([Increase rating])
-    E -->|No| G([Decrease rating])
-
-    F --> C
-    G --> C
-
-    D --> H([After X orders: if rating ≥ minimum → next level])
-    H -->|Otherwise| I([Game Over])
-```
+Start Game
+   ↓
+Start with assembly station + ingredients
+   ↓
+Customer specifies order
+   ↓
+Assemble order
+   ↓
+Is order correct?
+   ├── Yes → Increase rating → back to next customer
+   └── No  → Decrease rating → back to next customer
+   ↓
+After X orders:
+   ├── Rating ≥ minimum → Next level (harder)
+   └── Otherwise → Game Over
 
 ## Contributors
 - Aarav Chowdhary 
 - Jane Ho
 - Jahnavi Panchal
 - Brianna Sengchan
+
+## General Goals
+Jane & Brianna - Arts/Assets
+    - Counter with all possible ingredients 
+    - various NPCs/customer models + speech bubbles
+    - Player model with uniform 
+    - Customer emotes/symbols to indicate satisfaction (order correct/incorrect)
+    - Will assist in Coding/Gameplay 
+Aarav & Jahnavi - Coding/Gameplay 
+    - Player movement 
+    - Picking up/putting down ingredients on dough
+    - NPC movement with speech bubble
+    - Calculate order accuracy/overall rating 
+    
+
+
 
 
 
