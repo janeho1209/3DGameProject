@@ -48,7 +48,11 @@ Aarav & Jahnavi - Coding/Gameplay
 ```
 ## Possible Additions
 - Timed aspect/Day cycle
-- Coins/Capitalism for upgrades/customizables 
+- Coins/Capitalism for upgrades/customizables
+
+## Current Progress
+
+https://drive.google.com/file/d/1SU2HD7Ev4vj8cfcIbUHE3rYuGZbVxyza/view?usp=sharing
     
 
 
