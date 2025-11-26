@@ -24,7 +24,7 @@ flowchart TD
 
     D --> H([After X orders: if rating ≥ minimum → next level])
     H -->|Otherwise| I([Game Over])
-
+```
 
 ## Contributors
 - Aarav Chowdhary 
