@@ -38,7 +38,8 @@ Jane & Brianna - Arts/Assets
     - various NPCs/customer models + speech bubbles
     - Player model with uniform 
     - Customer emotes/symbols to indicate satisfaction (order correct/incorrect)
-    - Will assist in Coding/Gameplay 
+    - Will assist in Coding/Gameplay
+
 Aarav & Jahnavi - Coding/Gameplay 
     - Player movement 
     - Picking up/putting down ingredients on dough
