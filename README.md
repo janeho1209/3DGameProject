@@ -1,5 +1,5 @@
 # Doughmination 
-```
+
 A pizza shop simulator where the player is running a pizza shop. A customer will arrive every so often with their order 
 above their head and the player must run around the kitchen to gather the respective ingredients, placing them on the dough.
 After the order has been made, the player must pickup the pizza and hand it to the respective customer. 
@@ -8,7 +8,7 @@ The goal is to complete as many orders correctly to maintain a high store rating
 rating will result in a game over. 
 
 ## Gameplay Loop
-
+```
 Start Game
    ↓
 Start with assembly station + ingredients
