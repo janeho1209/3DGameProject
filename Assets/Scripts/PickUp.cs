@@ -3,7 +3,7 @@ using UnityEngine;
 public class PickUp : MonoBehaviour
 {
     public Transform inHand;
-    public float hitbox = 0.1f;
+    public float hitbox = 1f;
     public KeyCode pickupKey = KeyCode.X;
     private GameObject heldCopy = null;
     private GameObject objectToCopy = null;
