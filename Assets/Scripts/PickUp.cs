@@ -6,6 +6,27 @@ public class PlayerPickup : MonoBehaviour
     public KeyCode pickupKey = KeyCode.X;
     private GameObject objectInRange = null; //items in range that can be picked up
     private GameObject heldObject = null;    //object being held
+    private bool isOverFrontCounter = false;
+    public Transform frontCounterSpace;
+
+
+    private void OnTriggerEnter(Collider c)
+    {
+        if (c.CompareTag("FrontCounter"))
+        {
+            isOverFrontCounter = true;
+            frontCounterSpace = c.transform.Find("pizza");
+        }
+    }
+
+    private void OnTriggerExit(Collider c)
+    {
+        if (c.CompareTag("FrontCounter"))
+        {
+            isOverFrontCounter = false;
+            frontCounterSpace = null;
+        }
+    }
 
     private void Update()
     {
@@ -68,6 +89,25 @@ public class PlayerPickup : MonoBehaviour
         {
             col.enabled = true;
         }
+
+        if (isOverFrontCounter && frontCounterSpace != null)
+        {
+            Ingredient ingredient = heldObject.GetComponent<Ingredient>();
+            PizzaStack assembler = frontCounterSpace.GetComponent<PizzaStack>();
+
+            if (ingredient != null && assembler != null)
+            {
+                assembler.TryAddIngredient(ingredient);
+            }
+
+            Destroy(heldObject); // consume ingredient
+        }
+
+        else
+        {
+            Destroy(heldObject);
+        }
+
 
         heldObject = null;
     }

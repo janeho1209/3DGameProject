@@ -291,6 +291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickUp
   inHand: {fileID: 883304572}
   pickupKey: 120
+  frontCounterSpace: {fileID: 0}
 --- !u!1 &89794514
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,6 +444,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 172908260}
+  - component: {fileID: 172908261}
   m_Layer: 0
   m_Name: pizza
   m_TagString: Untagged
@@ -459,12 +461,28 @@ Transform:
   m_GameObject: {fileID: 172908259}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 214234432}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &172908261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172908259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 315e0fd2cb201a44988b2b5e1f244cd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PizzaStack
+  doughVisual: {fileID: 919132149155446097, guid: 24c5538fc767bd64199070a7ec9a777b, type: 3}
+  sauceVisual: {fileID: 919132149155446097, guid: ed321e2d23432894e8f404dbe8dcb4b4, type: 3}
+  cheeseVisual: {fileID: 919132149155446097, guid: b930183d72b5c3941ac7d98f8ff5b224, type: 3}
+  pepperoniVisual: {fileID: 919132149155446097, guid: 117e00889ecbb2944803e943935ef1a4, type: 3}
 --- !u!1 &214234426
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +500,7 @@ GameObject:
   - component: {fileID: 214234433}
   m_Layer: 0
   m_Name: Front Counter
-  m_TagString: Untagged
+  m_TagString: FrontCounter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -841,7 +859,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.9004121, y: 0.7523165, z: 6.9410243}
+  m_Size: {x: 2.2, y: 0.7523165, z: 6.9410243}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
