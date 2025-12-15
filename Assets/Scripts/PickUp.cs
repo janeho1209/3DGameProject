@@ -12,7 +12,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider c)
     {
-        if (c.CompareTag("FrontCounter"))
+        if (c.CompareTag("FrontCounter")) //if drop space is counter, set it on counter
         {
             isOverFrontCounter = true;
             frontCounterSpace = c.transform.Find("pizza");
@@ -21,7 +21,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void OnTriggerExit(Collider c)
     {
-        if (c.CompareTag("FrontCounter"))
+        if (c.CompareTag("FrontCounter")) 
         {
             isOverFrontCounter = false;
             frontCounterSpace = null;
@@ -30,7 +30,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void Update()
     {
-        if (heldObject == null)
+        if (heldObject == null) //find a pickupable object
         {
             objectInRange = NearestPickup();
         }
@@ -70,10 +70,10 @@ public class PlayerPickup : MonoBehaviour
     private void PickUp(GameObject obj)
     {
         heldObject = Instantiate(obj, inHand.position, obj.transform.rotation); //instance of the ingredient
-        heldObject.transform.SetParent(inHand);
+        heldObject.transform.SetParent(inHand); //makes sure it is a child of inHand
 
-        Collider col = heldObject.GetComponent<Collider>();
-        if (col != null)
+        Collider col = heldObject.GetComponent<Collider>(); 
+        if (col != null) //prevents weird physics
         {
             col.enabled = false;
         }
@@ -93,14 +93,14 @@ public class PlayerPickup : MonoBehaviour
         if (isOverFrontCounter && frontCounterSpace != null)
         {
             Ingredient ingredient = heldObject.GetComponent<Ingredient>();
-            PizzaStack assembler = frontCounterSpace.GetComponent<PizzaStack>();
+            PizzaStack stack = frontCounterSpace.GetComponent<PizzaStack>();
 
-            if (ingredient != null && assembler != null)
+            if (ingredient != null && stack != null) //checks if the ingredient can be stacked and what asset should appear on the counter
             {
-                assembler.TryAddIngredient(ingredient);
+                stack.TryAddIngredient(ingredient);
             }
 
-            Destroy(heldObject); // consume ingredient
+            Destroy(heldObject); //gets rid of asset in hand
         }
 
         else

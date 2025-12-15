@@ -16,7 +16,7 @@ public class PizzaStack : MonoBehaviour
 
     public void TryAddIngredient(Ingredient ingredient)
     {
-        switch (ingredient.type)
+        switch (ingredient.type) //will only spawn on counter if stack has dough -> sauce -> cheese order
         {
             case IngredientType.Dough:
                 if (!hasDough)
@@ -53,11 +53,11 @@ public class PizzaStack : MonoBehaviour
 
     private void Spawn(GameObject prefab)
     {
-        Vector3 spawnPos = transform.position + Vector3.up * currentHeight;
+        Vector3 spawnPos = transform.position + Vector3.up * currentHeight; //makes sure ingredients look stacked
         GameObject go = Instantiate(prefab);
-        go.transform.SetParent(transform, worldPositionStays: true); // keep world scale/rotation
-        go.transform.position = transform.position + Vector3.up * currentHeight; // place on top of counter
-        go.transform.rotation = prefab.transform.rotation;
+        go.transform.SetParent(transform, worldPositionStays: true); 
+        go.transform.position = transform.position + Vector3.up * currentHeight; //place on top of counter/other ingredients
+        go.transform.rotation = prefab.transform.rotation; //preserve the original rotation
         currentHeight += ingredientHeight;
     }
 }
