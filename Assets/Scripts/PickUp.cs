@@ -1,41 +1,83 @@
 using UnityEngine;
 
-public class PickUp : MonoBehaviour {
-    public Transform inHand;
-    public float hitbox = 1f;
+public class PlayerPickup : MonoBehaviour
+{
+    public Transform inHand; //held item space
     public KeyCode pickupKey = KeyCode.X;
-    private GameObject heldCopy = null;
-    private GameObject objectToCopy = null;
+    private GameObject objectInRange = null; //items in range that can be picked up
+    private GameObject heldObject = null;    //object being held
 
-    void Update() {
-        if (objectToCopy == null) {
-            Collider[] hits = Physics.OverlapSphere(transform.position, hitbox);
-            foreach (Collider hit in hits) {
-                if (hit.CompareTag("Pickup")) {
-                    objectToCopy = hit.gameObject;
-                    break;
-                }
-
-            }
-
+    private void Update()
+    {
+        if (heldObject == null)
+        {
+            objectInRange = NearestPickup();
         }
 
-        if (Input.GetKey(pickupKey) && objectToCopy != null) {
-            if (heldCopy == null) {
-                heldCopy = Instantiate(objectToCopy);
-            }
-
-            heldCopy.transform.position = inHand.position;
-            heldCopy.transform.rotation = inHand.rotation;
-        } else {
-            if (heldCopy != null) {
-                Destroy(heldCopy);
-                heldCopy = null;
-                objectToCopy = null;
-            }
-
+        if (Input.GetKeyDown(pickupKey) && heldObject == null && objectInRange != null)
+        {
+            PickUp(objectInRange);
+        }
+        else if (Input.GetKeyDown(pickupKey) && heldObject != null)
+        {
+            DropHeldObject();
         }
 
     }
-    
+
+    private GameObject NearestPickup()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, 2f);
+        GameObject nearest = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Pickup"))
+            {
+                float dist = Vector3.Distance(transform.position, hit.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearest = hit.gameObject;
+                }
+            }
+        }
+
+        return nearest;
+    }
+    private void PickUp(GameObject obj)
+    {
+        heldObject = Instantiate(obj, inHand.position, obj.transform.rotation); //instance of the ingredient
+        heldObject.transform.SetParent(inHand);
+
+        Collider col = heldObject.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+    }
+    private void DropHeldObject()
+    {
+        if (heldObject == null) return;
+
+        heldObject.transform.SetParent(null);
+
+        Collider col = heldObject.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        heldObject = null;
+    }
+    public GameObject GetHeldObject()
+    {
+        return heldObject;
+    }
+
+    public bool IsHoldingObject()
+    {
+        return heldObject != null;
+    }
 }
