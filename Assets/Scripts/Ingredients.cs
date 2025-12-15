@@ -4,8 +4,8 @@ public enum IngredientType
     Tomato,
     Cheese,
     Pepperoni,
-    Olive,
     Mushroom,
+    Pesto,
     Pineapple,
     Banana
 }
