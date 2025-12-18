@@ -12,15 +12,19 @@ public class PizzaStack : MonoBehaviour
     private bool hasSauce = false;
     private bool hasCheese = false;
 
-    private float currentHeight = 0f;
+    public float currentHeight = 0f;
     public float ingredientHeight = 1.0f;
 
     // NEW: Track what ingredients are in the pizza
     private List<IngredientType> ingredients = new List<IngredientType>();
 
-    public void TryAddIngredient(Ingredient ingredient)
+    public bool TryAddIngredient(Ingredient ingredient)
     {
-        switch (ingredient.type) //will only spawn on counter if stack has dough -> sauce -> cheese order
+        Debug.Log($"Stack position: {transform.position}, height: {currentHeight}");
+
+        bool added = false;
+
+        switch (ingredient.type)
         {
             case IngredientType.Dough:
                 if (!hasDough)
@@ -28,6 +32,7 @@ public class PizzaStack : MonoBehaviour
                     Spawn(doughVisual);
                     hasDough = true;
                     ingredients.Add(IngredientType.Dough);
+                    added = true;
                 }
                 break;
 
@@ -37,6 +42,7 @@ public class PizzaStack : MonoBehaviour
                     Spawn(sauceVisual);
                     hasSauce = true;
                     ingredients.Add(IngredientType.Tomato);
+                    added = true;
                 }
                 break;
 
@@ -46,6 +52,7 @@ public class PizzaStack : MonoBehaviour
                     Spawn(cheeseVisual);
                     hasCheese = true;
                     ingredients.Add(IngredientType.Cheese);
+                    added = true;
                 }
                 break;
 
@@ -54,21 +61,23 @@ public class PizzaStack : MonoBehaviour
                 {
                     Spawn(pepperoniVisual);
                     ingredients.Add(IngredientType.Pepperoni);
+                    added = true;
                 }
                 break;
         }
 
-        // NEW: Mark as completed pizza when it has cheese (minimum viable pizza)
-        if (hasDough && !gameObject.CompareTag("CompletedPizza"))
+        if (added && hasDough && !CompareTag("CompletedPizza"))
         {
             gameObject.tag = "CompletedPizza";
             Debug.Log("Pizza is ready to be picked up!");
         }
+
+        return added;
     }
+
 
     private void Spawn(GameObject prefab)
     {
-        //Vector3 spawnPos = transform.position + Vector3.up * currentHeight; //makes sure ingredients look stacked
         GameObject go = Instantiate(prefab);
         go.transform.SetParent(transform, worldPositionStays: true);
         go.transform.position = transform.position + Vector3.up * currentHeight; //place on top of counter/other ingredients
@@ -91,4 +100,22 @@ public class PizzaStack : MonoBehaviour
     {
         return pepperoniVisual.activeSelf;
     }
+
+    public void ResetPizza()
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        hasDough = false;
+        hasSauce = false;
+        hasCheese = false;
+
+        ingredients.Clear();
+        currentHeight = 0f;
+
+        gameObject.tag = "Untagged";
+    }
+
 }

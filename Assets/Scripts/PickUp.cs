@@ -86,86 +86,49 @@ public class PlayerPickup : MonoBehaviour
 
     private void PickUp(GameObject obj)
     {
-        PizzaStack pizzaStack = obj.GetComponent<PizzaStack>();
-        if (pizzaStack == null) pizzaStack = obj.GetComponentInParent<PizzaStack>();
+        PizzaStack sourceStack = obj.GetComponent<PizzaStack>();
+        if (sourceStack == null)
+            sourceStack = obj.GetComponentInParent<PizzaStack>();
 
-        // If it's a completed pizza, pick up the whole pizza
-        if (pizzaStack != null && obj.CompareTag("CompletedPizza"))
+        if (sourceStack != null && sourceStack.CompareTag("CompletedPizza"))
         {
-            heldPizzaStack = pizzaStack;
-            heldObject = obj;
+            GameObject pizzaCopy = Instantiate( //create copy for player's hand
+                sourceStack.gameObject,
+                inHand.position,
+                Quaternion.identity
+            );
 
-            // Parent it to hand
-            heldObject.transform.SetParent(inHand);
-            heldObject.transform.localPosition = Vector3.zero;
-            heldObject.transform.localRotation = Quaternion.identity;
+            pizzaCopy.transform.SetParent(inHand, false);
+            pizzaCopy.transform.localPosition = Vector3.zero;
+            pizzaCopy.transform.localRotation = Quaternion.identity;
+            pizzaCopy.transform.localScale = Vector3.one;
 
-            Collider col = heldObject.GetComponent<Collider>();
-            if (col != null) col.enabled = false;
+            if (pizzaCopy.TryGetComponent(out Collider col)) //prevents weird physics
+                col.enabled = false;
 
-            Rigidbody rb = heldObject.GetComponent<Rigidbody>();
-            if (rb != null) rb.isKinematic = true;
+            heldObject = pizzaCopy; //tracks held pizza
+            heldPizzaStack = pizzaCopy.GetComponent<PizzaStack>();
+            sourceStack.ResetPizza(); //clear counter
 
-            Debug.Log("Picked up a COMPLETED pizza!");
+            return;
         }
-        else
-        {
-            // existing logic for individual ingredients
-            heldObject = Instantiate(obj, inHand.position, obj.transform.rotation);
-            heldObject.transform.SetParent(inHand);
-            heldObject.transform.localPosition = Vector3.zero;
-            heldObject.transform.localRotation = Quaternion.identity;
 
-            Collider col = heldObject.GetComponent<Collider>();
-            if (col != null) col.enabled = false;
+        // PICK UP INGREDIENT (unchanged)
+        heldObject = Instantiate(obj, inHand);
+        heldObject.transform.localPosition = Vector3.zero;
+        heldObject.transform.localRotation = Quaternion.identity;
 
-            Rigidbody rb = heldObject.GetComponent<Rigidbody>();
-            if (rb != null) rb.isKinematic = true;
+        if (heldObject.TryGetComponent(out Collider ingredientCol))
+            ingredientCol.enabled = false;
 
-            heldPizzaStack = null;
+        if (heldObject.TryGetComponent(out Rigidbody ingredientRb))
+            ingredientRb.isKinematic = true;
 
-            Debug.Log("Picked up a regular ingredient.");
-        }
+        heldPizzaStack = null;
+
+        Debug.Log("Picked up regular ingredient");
     }
 
-
-    private void DetachHeldObject()
-    {
-        heldObject.transform.SetParent(null);
-
-        Collider col = heldObject.GetComponent<Collider>();
-        if (col != null)
-        {
-            col.enabled = true;
-        }
-
-        Rigidbody rb = heldObject.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = false;
-        }
-
-        if (isOverFrontCounter && frontCounterSpace != null)
-        {
-            Ingredient ingredient = heldObject.GetComponent<Ingredient>();
-            PizzaStack stack = frontCounterSpace.GetComponent<PizzaStack>();
-
-            if (ingredient != null && stack != null) //checks if the ingredient can be stacked and what asset should appear on the counter
-            {
-                stack.TryAddIngredient(ingredient);
-            }
-
-            Destroy(heldObject); //gets rid of asset in hand
-        }
-
-        else
-        {
-            Destroy(heldObject);
-        }
-
-
-        heldObject = null;
-    }
 
     private void DropHeldObject()
     {
@@ -175,20 +138,25 @@ public class PlayerPickup : MonoBehaviour
 
         if (isOverFrontCounter && frontCounterSpace != null)
         {
+            Debug.Log("trying to add ingredient");
             Ingredient ingredient = heldObject.GetComponent<Ingredient>();
             PizzaStack stack = frontCounterSpace.GetComponent<PizzaStack>();
 
-            if (ingredient != null && stack != null)
+            if (ingredient != null)
             {
-                stack.TryAddIngredient(ingredient);
-                Destroy(heldObject);
-                wasDestroyed = true;
+                bool added = stack.TryAddIngredient(ingredient);
+
+                if (added)
+                {
+                    Destroy(heldObject);
+                    wasDestroyed = true;
+                }
             }
         }
 
         if (!wasDestroyed)
         {
-            DetachHeldObject();
+            Destroy(heldObject);
         }
 
         heldObject = null;
@@ -219,12 +187,13 @@ public class PlayerPickup : MonoBehaviour
         if (nearestCustomer != null)
         {
             // Give the ingredients to the customer
-            nearestCustomer.ReceivePizza(heldPizzaStack.GetIngredients());
+            //nearestCustomer.ReceivePizza(heldPizzaStack.GetIngredients());
 
             // Destroy the pizza object in hand
-            Destroy(heldPizzaStack.gameObject);
-            heldPizzaStack = null;
-            heldObject = null;
+            nearestCustomer.ReceivePizza(heldPizzaStack.GetIngredients());
+            heldPizzaStack.ResetPizza();
+            //heldPizzaStack = null;
+            //heldObject = null;
 
             Debug.Log("Pizza delivered!");
         }
@@ -240,4 +209,6 @@ public class PlayerPickup : MonoBehaviour
     {
         return heldObject != null;
     }
+
+
 }
