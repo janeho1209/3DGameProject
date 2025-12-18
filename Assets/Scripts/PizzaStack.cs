@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PizzaStack : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class PizzaStack : MonoBehaviour
     private float currentHeight = 0f;
     public float ingredientHeight = 1.0f;
 
+    // NEW: Track what ingredients are in the pizza
+    private List<IngredientType> ingredients = new List<IngredientType>();
+
     public void TryAddIngredient(Ingredient ingredient)
     {
         switch (ingredient.type) //will only spawn on counter if stack has dough -> sauce -> cheese order
@@ -23,6 +27,7 @@ public class PizzaStack : MonoBehaviour
                 {
                     Spawn(doughVisual);
                     hasDough = true;
+                    ingredients.Add(IngredientType.Dough);
                 }
                 break;
 
@@ -31,6 +36,7 @@ public class PizzaStack : MonoBehaviour
                 {
                     Spawn(sauceVisual);
                     hasSauce = true;
+                    ingredients.Add(IngredientType.Tomato);
                 }
                 break;
 
@@ -39,6 +45,7 @@ public class PizzaStack : MonoBehaviour
                 {
                     Spawn(cheeseVisual);
                     hasCheese = true;
+                    ingredients.Add(IngredientType.Cheese);
                 }
                 break;
 
@@ -46,18 +53,43 @@ public class PizzaStack : MonoBehaviour
                 if (hasCheese)
                 {
                     Spawn(pepperoniVisual);
+                    ingredients.Add(IngredientType.Pepperoni);
                 }
                 break;
+        }
+
+        // NEW: Mark as completed pizza when it has cheese (minimum viable pizza)
+        if (hasCheese && !gameObject.CompareTag("CompletedPizza"))
+        {
+            gameObject.tag = "CompletedPizza";
+            Debug.Log("Pizza is ready to be picked up!");
         }
     }
 
     private void Spawn(GameObject prefab)
     {
-        Vector3 spawnPos = transform.position + Vector3.up * currentHeight; //makes sure ingredients look stacked
+        if (prefab == null) return;
+
         GameObject go = Instantiate(prefab);
-        go.transform.SetParent(transform, worldPositionStays: true); 
-        go.transform.position = transform.position + Vector3.up * currentHeight; //place on top of counter/other ingredients
-        go.transform.rotation = prefab.transform.rotation; //preserve the original rotation
+        go.transform.SetParent(transform, worldPositionStays: false);
+        go.transform.localPosition = Vector3.up * currentHeight;
+        go.transform.localRotation = prefab.transform.rotation;
         currentHeight += ingredientHeight;
+    }
+
+    // NEW: Get list of ingredients for scoring
+    public List<IngredientType> GetIngredients()
+    {
+        return new List<IngredientType>(ingredients);
+    }
+
+    public bool HasCheese()
+    {
+        return hasCheese;
+    }
+
+    public bool HasPepperoni()
+    {
+        return pepperoniVisual.activeSelf;
     }
 }

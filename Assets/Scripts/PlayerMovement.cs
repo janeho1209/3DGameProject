@@ -4,8 +4,14 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private Transform cameraTransform;
 
+    [SerializeField] private float acceleration = 10f;
+    [SerializeField] private float deceleration = 15f;
+    [SerializeField] private float turnSpeed = 10f;
+
     private Rigidbody rb;
     private Vector3 inputDir;
+
+    private Vector3 currentVelocity;
 
     private void Awake() {
         rb = GetComponent<Rigidbody>();
@@ -26,7 +32,6 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        if (inputDir.sqrMagnitude < 0.0001f) return;
 
         // Camera-based directions
         Vector3 camForward = cameraTransform.forward;
@@ -40,10 +45,19 @@ public class PlayerMovement : MonoBehaviour {
         Vector3 moveDir = camForward * inputDir.z + camRight * inputDir.x;
         moveDir.Normalize();
 
-        Vector3 targetPos = rb.position + moveDir * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(targetPos);
+        Vector3 targetVelocity = moveDir * moveSpeed;
 
-        Quaternion targetRot = Quaternion.LookRotation(moveDir);
-        rb.MoveRotation(targetRot);
+        float smooth = inputDir.sqrMagnitude > 0.01f ? acceleration : deceleration;
+
+        currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, smooth * Time.fixedDeltaTime);
+
+        rb.MovePosition(rb.position + currentVelocity * Time.fixedDeltaTime);
+
+        if (currentVelocity.sqrMagnitude > 0.01f) {
+            Quaternion targetRot = Quaternion.LookRotation(currentVelocity.normalized);
+
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, turnSpeed * Time.fixedDeltaTime));
+        }
+        
     }
 }

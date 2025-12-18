@@ -2,17 +2,21 @@ using UnityEngine;
 
 public class PlayerPickup : MonoBehaviour
 {
-    public Transform inHand; //held item space
+    public Transform inHand;
     public KeyCode pickupKey = KeyCode.X;
-    private GameObject objectInRange = null; //items in range that can be picked up
-    private GameObject heldObject = null;    //object being held
+    public KeyCode deliverKey = KeyCode.C; // NEW: Delivery key
+
+    private GameObject objectInRange = null;
+    private GameObject heldObject = null;
     private bool isOverFrontCounter = false;
     public Transform frontCounterSpace;
 
+    // NEW: Track if holding completed pizza
+    private PizzaStack heldPizzaStack = null;
 
     private void OnTriggerEnter(Collider c)
     {
-        if (c.CompareTag("FrontCounter")) //if drop space is counter, set it on counter
+        if (c.CompareTag("FrontCounter"))
         {
             isOverFrontCounter = true;
             frontCounterSpace = c.transform.Find("pizza");
@@ -21,7 +25,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void OnTriggerExit(Collider c)
     {
-        if (c.CompareTag("FrontCounter")) 
+        if (c.CompareTag("FrontCounter"))
         {
             isOverFrontCounter = false;
             frontCounterSpace = null;
@@ -30,20 +34,32 @@ public class PlayerPickup : MonoBehaviour
 
     private void Update()
     {
-        if (heldObject == null) //find a pickupable object
+        if (heldObject == null)
         {
-            objectInRange = NearestPickup();
+            objectInRange = NearestPickup(); // This finds both "Pickup" and "CompletedPizza"
         }
 
-        if (Input.GetKeyDown(pickupKey) && heldObject == null && objectInRange != null)
+        // Handle Pickup/Drop Logic (X Key)
+        if (Input.GetKeyDown(pickupKey))
         {
-            PickUp(objectInRange);
-        }
-        else if (Input.GetKeyDown(pickupKey) && heldObject != null)
-        {
-            DropHeldObject();
+            // When hand is empty and something is nearby
+            if (heldObject == null && objectInRange != null)
+            {
+                PickUp(objectInRange);
+            }
+            // Holding something, press X to drop
+            else if (heldObject != null)
+            {
+                DropHeldObject();
+                heldPizzaStack = null;
+            }
         }
 
+        // Handle Delivery Logic (C Key)
+        if (Input.GetKeyDown(deliverKey) && heldPizzaStack != null)
+        {
+            TryDeliverPizza();
+        }
     }
 
     private GameObject NearestPickup()
@@ -54,7 +70,7 @@ public class PlayerPickup : MonoBehaviour
 
         foreach (Collider hit in hits)
         {
-            if (hit.CompareTag("Pickup"))
+            if (hit.CompareTag("Pickup") || hit.CompareTag("CompletedPizza"))
             {
                 float dist = Vector3.Distance(transform.position, hit.transform.position);
                 if (dist < minDist)
@@ -67,21 +83,39 @@ public class PlayerPickup : MonoBehaviour
 
         return nearest;
     }
+
     private void PickUp(GameObject obj)
     {
-        heldObject = Instantiate(obj, inHand.position, obj.transform.rotation); //instance of the ingredient
-        heldObject.transform.SetParent(inHand); //makes sure it is a child of inHand
+        PizzaStack pizzaStack = obj.GetComponent<PizzaStack>();
+        if (pizzaStack == null) pizzaStack = obj.GetComponentInParent<PizzaStack>();
 
-        Collider col = heldObject.GetComponent<Collider>(); 
-        if (col != null) //prevents weird physics
+        // Check if the object is tagged as a completed pizza
+        if (pizzaStack != null && obj.CompareTag("CompletedPizza"))
         {
-            col.enabled = false;
+            heldPizzaStack = pizzaStack;
+            heldObject = obj;
+            Debug.Log("Picked up a COMPLETED pizza!");
         }
-    }
-    private void DropHeldObject()
-    {
-        if (heldObject == null) return;
+        else
+        {
+            heldObject = obj;
+            heldPizzaStack = null;
+            Debug.Log("Picked up a regular item.");
+        }
 
+        heldObject.transform.SetParent(inHand);
+        heldObject.transform.localPosition = Vector3.zero;
+        heldObject.transform.localRotation = Quaternion.identity;
+
+        Collider col = heldObject.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        Rigidbody rb = heldObject.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
+    }
+
+    private void DetachHeldObject()
+    {
         heldObject.transform.SetParent(null);
 
         Collider col = heldObject.GetComponent<Collider>();
@@ -90,27 +124,72 @@ public class PlayerPickup : MonoBehaviour
             col.enabled = true;
         }
 
+        Rigidbody rb = heldObject.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+        }
+    }
+
+    private void DropHeldObject()
+    {
+        if (heldObject == null) return;
+
+        bool wasDestroyed = false;
+
         if (isOverFrontCounter && frontCounterSpace != null)
         {
             Ingredient ingredient = heldObject.GetComponent<Ingredient>();
             PizzaStack stack = frontCounterSpace.GetComponent<PizzaStack>();
 
-            if (ingredient != null && stack != null) //checks if the ingredient can be stacked and what asset should appear on the counter
+            if (ingredient != null && stack != null)
             {
                 stack.TryAddIngredient(ingredient);
+                Destroy(heldObject);
+                wasDestroyed = true;
             }
-
-            Destroy(heldObject); //gets rid of asset in hand
         }
 
-        else
+        if (!wasDestroyed)
         {
-            Destroy(heldObject);
+            DetachHeldObject();
         }
-
 
         heldObject = null;
     }
+
+    private void TryDeliverPizza()
+    {
+        if (heldPizzaStack == null) return;
+
+        Collider[] hits = Physics.OverlapSphere(transform.position, 3f);
+        CustomerOrder nearestCustomer = null;
+        float minDist = Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            CustomerOrder customer = hit.GetComponent<CustomerOrder>();
+            if (customer != null)
+            {
+                float dist = Vector3.Distance(transform.position, hit.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearestCustomer = customer;
+                }
+            }
+        }
+
+        if (nearestCustomer != null)
+        {
+            nearestCustomer.ReceivePizza(heldPizzaStack.GetIngredients());
+
+            Destroy(heldObject);
+            heldObject = null;
+            heldPizzaStack = null;
+        }
+    }
+
     public GameObject GetHeldObject()
     {
         return heldObject;
