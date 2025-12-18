@@ -12,7 +12,13 @@ public class ThirdPersonCamera : MonoBehaviour {
     [SerializeField] private float mouseSensitivity = 3f;
     [SerializeField] private float minPitch = -30f;
     [SerializeField] private float maxPitch = 60f;
+    [SerializeField] private float mouseSmoothing = 8f;
+    [SerializeField] private float swayAmount = 2f;
+    [SerializeField] private float swaySmoothness = 6f;
 
+    private Vector2 smoothMouse;
+    private Vector2 mouseVelocity;
+    private float currentSway;
     private float yaw;
     private float pitch;
 
@@ -36,14 +42,24 @@ public class ThirdPersonCamera : MonoBehaviour {
         if (target == null) return;
 
         // Mouse input
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        // NEW:
 
-        yaw   += mouseX;
-        pitch -= mouseY;
+        Vector2 rawMouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensitivity;
+        smoothMouse = Vector2.SmoothDamp(smoothMouse, rawMouseInput, ref mouseVelocity, 1f / mouseSmoothing);
+
+        // OLD:
+        //float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        //float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        float targetSway = -smoothMouse.x * swayAmount;
+        currentSway = Mathf.Lerp(currentSway, targetSway, Time.deltaTime * swaySmoothness);
+
+
+        yaw += smoothMouse.x;
+        pitch -= smoothMouse.y;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0f);
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, currentSway);
 
         Vector3 offset = rotation * new Vector3(0f, height, -distance);
         transform.position = target.position + offset;
