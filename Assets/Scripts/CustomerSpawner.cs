@@ -8,10 +8,10 @@ public class CustomerSpawner : MonoBehaviour
     public GameObject customerPrefab;
 
     [Header("Spawn Settings")]
-    public Transform spawnPoint;
-    public Transform customerTarget; // Counter position
+    public Transform spawnPoint;        // Where customers spawn
+    public Transform customerTarget;    // Counter position
     public float spawnInterval = 4f;
-    public int maxCustomers = 3; // Max customers at once
+    public int maxCustomers = 3;        // Max customers at once
 
     private int currentCustomerCount = 0;
 
@@ -49,12 +49,36 @@ public class CustomerSpawner : MonoBehaviour
         }
 
         GameObject randomPrefab = customerPrefabs[Random.Range(0, customerPrefabs.Length)];
-        GameObject customer = Instantiate(randomPrefab, spawnPoint.position, spawnPoint.rotation);
+        SpawnCustomerAtPosition(randomPrefab);
+    }
 
+    public void SpawnCustomer()
+    {
+        if (customerPrefab == null)
+        {
+            Debug.LogError("No customer prefab assigned!");
+            return;
+        }
+
+        SpawnCustomerAtPosition(customerPrefab);
+    }
+
+    private void SpawnCustomerAtPosition(GameObject prefab)
+    {
+        GameObject customer = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
+
+        // Set movement target
         CustomerMovement movement = customer.GetComponent<CustomerMovement>();
         if (movement != null)
         {
-            movement.target = customerTarget;
+            movement.SetTarget(customerTarget);
+        }
+
+        // Set spawn position so customer can return after delivery
+        CustomerOrder order = customer.GetComponent<CustomerOrder>();
+        if (order != null)
+        {
+            order.spawnPosition = spawnPoint.position;
         }
 
         currentCustomerCount++;
@@ -63,23 +87,13 @@ public class CustomerSpawner : MonoBehaviour
         Debug.Log($"Spawned customer. Active customers: {currentCustomerCount}");
     }
 
-    public void SpawnCustomer()
-    {
-        GameObject customer = Instantiate(customerPrefab, spawnPoint.position, spawnPoint.rotation);
-
-        CustomerMovement movement = customer.GetComponent<CustomerMovement>();
-        movement.target = customerTarget;
-
-        currentCustomerCount++;
-        StartCoroutine(WaitForDespawn(customer));
-    }
-
     IEnumerator WaitForDespawn(GameObject customer)
     {
         while (customer != null)
         {
             yield return null;
         }
+
         currentCustomerCount--;
         Debug.Log($"Customer left. Active customers: {currentCustomerCount}");
     }

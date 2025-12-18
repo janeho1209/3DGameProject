@@ -161,7 +161,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d70766f64162d4442adcdfea6df7108a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerMovement
-  target: {fileID: 0}
   speed: 2
   stopDistance: 0.5
 --- !u!114 &-2386200401644248937
@@ -180,14 +179,12 @@ MonoBehaviour:
   bubbleAnchor: {fileID: 4181695113170040431}
   requiredIngredients: 
   orderText: I would like a pepperoni pizza!
-  requestedIngredient: 0
-  happyEmotePrefab: {fileID: 0}
-  neutralEmotePrefab: {fileID: 0}
-  sadEmotePrefab: {fileID: 0}
-  emoteDuration: 2
+  spawnPosition: {x: 0, y: 0, z: 0}
+  happyEmotePrefab: {fileID: 6180888648563013614, guid: 46b33ac9d03e24c43bf49b1b23843e66, type: 3}
+  neutralEmotePrefab: {fileID: 2775349470651354623, guid: da6c4151d984bdc48840ba4fad3a8e39, type: 3}
+  angryEmotePrefab: {fileID: 5335096975408299753, guid: 8d7d677d03ec6d145b5c8c53ee162c2f, type: 3}
   emoteAnchor: {fileID: 0}
-  happyEmote: {fileID: 0}
-  angryEmote: {fileID: 0}
+  activeBubble: {fileID: 0}
 --- !u!114 &6725009959083596290
 MonoBehaviour:
   m_ObjectHideFlags: 0

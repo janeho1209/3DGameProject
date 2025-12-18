@@ -1,40 +1,77 @@
 using UnityEngine;
 
-public class CustomerMovement : MonoBehaviour {
-    public Transform target;
+public class CustomerMovement : MonoBehaviour
+{
+    [Header("Movement Settings")]
     public float speed = 2f;
-    public float stopDistance = 0.5f;
+    public float stopDistance = 0.1f; // small distance for target reach
 
-    private bool reached;
+    private Transform targetTransform = null;
+    private Vector3? targetPosition = null;
 
-    void Update() {
-        if (reached || target == null) return;
+    private CustomerOrder order;
+    private bool walking = false;
 
-        float dist = Vector3.Distance(transform.position, target.position);
+    void Awake()
+    {
+        order = GetComponent<CustomerOrder>();
+    }
 
-        if (dist > stopDistance) {
-            transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+    void Update()
+    {
+        if (!walking) return;
 
-            Vector3 dir = (target.position - transform.position);
+        Vector3 currentTarget = targetTransform != null ? targetTransform.position : targetPosition ?? transform.position;
+
+        float dist = Vector3.Distance(transform.position, currentTarget);
+
+        if (dist > stopDistance)
+        {
+            Vector3 dir = currentTarget - transform.position;
             dir.y = 0;
-            if (dir.sqrMagnitude > 0.001f) {
+
+            transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
+
+            if (dir.sqrMagnitude > 0.001f)
+            {
                 Quaternion lookRot = Quaternion.LookRotation(dir);
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, 10f * Time.deltaTime);
             }
-
-        } else {
-            reached = true;
-            Debug.Log("Customer reached counter, showing order...");
-
-            CustomerOrder order = GetComponent<CustomerOrder>();
-            if (order != null) {
-                order.ShowOrder();
-            } else {
-                Debug.LogWarning("No CustomerOrder component found on Customer!");
-            }
-            
         }
+        else
+        {
+            walking = false;
 
+            // Reached the counter
+            if (targetTransform != null)
+            {
+                if (order != null)
+                    order.ShowOrder();
+            }
+            // Reached spawn/home
+            else
+            {
+                Destroy(gameObject); // only destroy AFTER reaching spawn
+            }
+        }
     }
-    
+
+    public void SetTarget(Transform t)
+    {
+        targetTransform = t;
+        targetPosition = null;
+        walking = true;
+    }
+
+    public void SetTarget(Vector3 pos)
+    {
+        targetTransform = null;
+        targetPosition = pos;
+        walking = true;
+    }
+
+    public bool IsWalking()
+    {
+        return walking;
+    }
 }

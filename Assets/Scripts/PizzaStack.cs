@@ -68,12 +68,11 @@ public class PizzaStack : MonoBehaviour
 
     private void Spawn(GameObject prefab)
     {
-        if (prefab == null) return;
-
+        //Vector3 spawnPos = transform.position + Vector3.up * currentHeight; //makes sure ingredients look stacked
         GameObject go = Instantiate(prefab);
-        go.transform.SetParent(transform, worldPositionStays: false);
-        go.transform.localPosition = Vector3.up * currentHeight;
-        go.transform.localRotation = prefab.transform.rotation;
+        go.transform.SetParent(transform, worldPositionStays: true);
+        go.transform.position = transform.position + Vector3.up * currentHeight; //place on top of counter/other ingredients
+        go.transform.rotation = prefab.transform.rotation; //preserve the original rotation
         currentHeight += ingredientHeight;
     }
 

@@ -1,71 +1,65 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 public class CustomerOrder : MonoBehaviour
 {
-
     [Header("Bubble Setup")]
     public GameObject speechBubblePrefab;
     public Transform bubbleAnchor;
-    private GameObject activeBubble;
 
     [Header("Order Settings")]
-    public IngredientType[] requiredIngredients; // What this customer wants
+    public IngredientType[] requiredIngredients;
     private bool shown = false;
     private bool orderFulfilled = false;
 
     [Header("Order Text")]
     [TextArea]
-    public string orderText = "I would like a pepperoni pizza!";
+    public string orderText = "I would like a pizza!";
 
-    [Header("Order Logic")]
-    public IngredientType requestedIngredient;
+    [Header("Spawn Tracking")]
+    public Vector3 spawnPosition;
 
     [Header("Emote Prefabs")]
-    public GameObject happyEmotePrefab;   // Score 3
-    public GameObject neutralEmotePrefab; // Score 2
-    public GameObject sadEmotePrefab;     // Score 1
-    public float emoteDuration = 2f;
-
-    [Header("Emotes")]
+    public GameObject happyEmotePrefab;   // 0 mistakes
+    public GameObject neutralEmotePrefab; // 1 mistake
+    public GameObject angryEmotePrefab;   // 2+ mistakes
     public Transform emoteAnchor;
-    public GameObject happyEmote;
-    public GameObject angryEmote;
+
+    [HideInInspector]
+    public GameObject activeBubble;
 
     void Start()
     {
         if (requiredIngredients == null || requiredIngredients.Length == 0)
-        {
             GenerateRandomOrder();
-        }
     }
 
     public void GenerateRandomOrder()
     {
-        // Level 1: Only Cheese or Pepperoni pizzas
         int randomOrder = Random.Range(0, 2);
 
         if (randomOrder == 0)
         {
-            // Cheese Pizza: Dough, Tomato, Cheese
-            requiredIngredients = new IngredientType[] {
+            requiredIngredients = new IngredientType[]
+            {
                 IngredientType.Dough,
                 IngredientType.Tomato,
                 IngredientType.Cheese
             };
-            requestedIngredient = IngredientType.Cheese;
+            orderText = "I would like a cheese pizza!";
         }
         else
         {
-            // Pepperoni Pizza: Dough, Tomato, Cheese, Pepperoni
-            requiredIngredients = new IngredientType[] {
+            requiredIngredients = new IngredientType[]
+            {
                 IngredientType.Dough,
                 IngredientType.Tomato,
                 IngredientType.Cheese,
                 IngredientType.Pepperoni
             };
-            requestedIngredient = IngredientType.Pepperoni;
+            orderText = "I would like a pepperoni pizza!";
         }
     }
 
@@ -74,25 +68,14 @@ public class CustomerOrder : MonoBehaviour
         if (shown) return;
         shown = true;
 
-        if (speechBubblePrefab == null)
-        {
-            Debug.LogWarning("No speechBubblePrefab assigned on CustomerOrder.");
-            return;
-        }
+        if (speechBubblePrefab == null) return;
 
         Transform parent = bubbleAnchor != null ? bubbleAnchor : transform;
-
-        orderText = requestedIngredient == IngredientType.Pepperoni
-        ? "I would like a pepperoni pizza!"
-        : "I would like a cheese pizza!";
-
         activeBubble = Instantiate(speechBubblePrefab, parent.position, Quaternion.identity, parent);
 
         TMP_Text text = activeBubble.GetComponentInChildren<TMP_Text>();
         if (text != null)
-        {
             text.text = orderText;
-        }
     }
 
     public void ReceivePizza(List<IngredientType> deliveredIngredients)
@@ -101,99 +84,84 @@ public class CustomerOrder : MonoBehaviour
         orderFulfilled = true;
 
         int score = CalculateScore(deliveredIngredients);
+        Debug.Log($"Score: {score}");
         ShowEmote(score);
 
         if (GameManager.Instance != null)
-        {
             GameManager.Instance.AddScore(score);
-        }
 
-        Invoke("DespawnCustomer", emoteDuration);
+        WalkBackHome();
     }
 
-    public void ReceivePizza(PizzaStack pizza)
+    private int CalculateScore(List<IngredientType> delivered)
     {
-        bool correct = CheckPizza(pizza);
-        ShowEmote(correct ? 3 : 1);
-        Destroy(pizza.gameObject);
-        Invoke("DespawnCustomer", emoteDuration);
+        int mistakes = 0;
+
+        // Count missing ingredients
+        foreach (IngredientType req in requiredIngredients)
+        {
+            if (!delivered.Contains(req))
+                mistakes++;
+        }
+
+        // Count extra ingredients
+        mistakes += Mathf.Max(0, delivered.Count - requiredIngredients.Length);
+
+        if (mistakes == 0) return 3; // happy
+        if (mistakes == 1) return 2; // neutral
+        return 1;                     // angry
     }
 
-    int CalculateScore(List<IngredientType> delivered)
-    {
-        // Perfect match = 3 stars (Happy)
-        // Partial match = 2 stars (Neutral)  
-        // Wrong/missing = 1 star (Sad)
-
-        if (delivered.Count != requiredIngredients.Length)
-        {
-            return 1;
-        }
-
-        int matchCount = 0;
-        foreach (IngredientType required in requiredIngredients)
-        {
-            if (delivered.Contains(required))
-            {
-                matchCount++;
-            }
-        }
-
-        if (matchCount == requiredIngredients.Length)
-        {
-            return 3;
-        }
-        else if (matchCount >= requiredIngredients.Length - 1)
-        {
-            return 2;
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
-    bool CheckPizza(PizzaStack pizza)
-    {
-        if (requestedIngredient == IngredientType.Cheese)
-            return pizza.HasCheese();
-
-        if (requestedIngredient == IngredientType.Pepperoni)
-            return pizza.HasPepperoni();
-
-        return false;
-    }
-
-    void ShowEmote(int score)
+    private void ShowEmote(int score)
     {
         if (activeBubble != null)
-        {
             Destroy(activeBubble);
-        }
 
-        GameObject emotePrefab = null;
+        GameObject prefab = null;
+        Debug.Log($"Score: {score}");
         switch (score)
         {
-            case 3:
-                emotePrefab = happyEmotePrefab;
-                break;
-            case 2:
-                emotePrefab = neutralEmotePrefab;
-                break;
-            case 1:
-                emotePrefab = sadEmotePrefab != null ? sadEmotePrefab : angryEmote;
-                break;
+            case 3: prefab = happyEmotePrefab; break;
+            case 2: prefab = neutralEmotePrefab; break;
+            case 1: prefab = angryEmotePrefab; break;
         }
 
-        if (emotePrefab != null)
+        if (prefab != null)
         {
             Transform parent = emoteAnchor != null ? emoteAnchor : transform;
-            Instantiate(emotePrefab, parent.position, Quaternion.identity, parent);
+            activeBubble = Instantiate(prefab, parent.position, Quaternion.identity, parent);
         }
     }
 
-    void DespawnCustomer()
+    public void WalkBackHome()
     {
+        CustomerMovement movement = GetComponent<CustomerMovement>();
+        if (movement != null)
+        {
+            movement.SetTarget(spawnPosition);
+        }
+
+        // Keep emote active until the customer reaches spawn
+        StartCoroutine(WaitUntilHome());
+    }
+
+    private IEnumerator WaitUntilHome()
+    {
+        CustomerMovement movement = GetComponent<CustomerMovement>();
+        if (movement == null) yield break;
+
+        // Wait until the customer actually stops moving
+        while (movement.IsWalking())
+        {
+            yield return null;
+        }
+
+        // Remove emote
+        if (activeBubble != null)
+            Destroy(activeBubble);
+
+        // Finally destroy customer
         Destroy(gameObject);
     }
+
 }

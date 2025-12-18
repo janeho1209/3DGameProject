@@ -89,30 +89,45 @@ public class PlayerPickup : MonoBehaviour
         PizzaStack pizzaStack = obj.GetComponent<PizzaStack>();
         if (pizzaStack == null) pizzaStack = obj.GetComponentInParent<PizzaStack>();
 
-        // Check if the object is tagged as a completed pizza
+        // If it's a completed pizza, pick up the whole pizza
         if (pizzaStack != null && obj.CompareTag("CompletedPizza"))
         {
             heldPizzaStack = pizzaStack;
             heldObject = obj;
+
+            // Parent it to hand
+            heldObject.transform.SetParent(inHand);
+            heldObject.transform.localPosition = Vector3.zero;
+            heldObject.transform.localRotation = Quaternion.identity;
+
+            Collider col = heldObject.GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            Rigidbody rb = heldObject.GetComponent<Rigidbody>();
+            if (rb != null) rb.isKinematic = true;
+
             Debug.Log("Picked up a COMPLETED pizza!");
         }
         else
         {
-            heldObject = obj;
+            // existing logic for individual ingredients
+            heldObject = Instantiate(obj, inHand.position, obj.transform.rotation);
+            heldObject.transform.SetParent(inHand);
+            heldObject.transform.localPosition = Vector3.zero;
+            heldObject.transform.localRotation = Quaternion.identity;
+
+            Collider col = heldObject.GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            Rigidbody rb = heldObject.GetComponent<Rigidbody>();
+            if (rb != null) rb.isKinematic = true;
+
             heldPizzaStack = null;
-            Debug.Log("Picked up a regular item.");
+
+            Debug.Log("Picked up a regular ingredient.");
         }
-
-        heldObject.transform.SetParent(inHand);
-        heldObject.transform.localPosition = Vector3.zero;
-        heldObject.transform.localRotation = Quaternion.identity;
-
-        Collider col = heldObject.GetComponent<Collider>();
-        if (col != null) col.enabled = false;
-
-        Rigidbody rb = heldObject.GetComponent<Rigidbody>();
-        if (rb != null) rb.isKinematic = true;
     }
+
 
     private void DetachHeldObject()
     {
@@ -129,6 +144,27 @@ public class PlayerPickup : MonoBehaviour
         {
             rb.isKinematic = false;
         }
+
+        if (isOverFrontCounter && frontCounterSpace != null)
+        {
+            Ingredient ingredient = heldObject.GetComponent<Ingredient>();
+            PizzaStack stack = frontCounterSpace.GetComponent<PizzaStack>();
+
+            if (ingredient != null && stack != null) //checks if the ingredient can be stacked and what asset should appear on the counter
+            {
+                stack.TryAddIngredient(ingredient);
+            }
+
+            Destroy(heldObject); //gets rid of asset in hand
+        }
+
+        else
+        {
+            Destroy(heldObject);
+        }
+
+
+        heldObject = null;
     }
 
     private void DropHeldObject()
@@ -182,13 +218,18 @@ public class PlayerPickup : MonoBehaviour
 
         if (nearestCustomer != null)
         {
+            // Give the ingredients to the customer
             nearestCustomer.ReceivePizza(heldPizzaStack.GetIngredients());
 
-            Destroy(heldObject);
-            heldObject = null;
+            // Destroy the pizza object in hand
+            Destroy(heldPizzaStack.gameObject);
             heldPizzaStack = null;
+            heldObject = null;
+
+            Debug.Log("Pizza delivered!");
         }
     }
+
 
     public GameObject GetHeldObject()
     {
