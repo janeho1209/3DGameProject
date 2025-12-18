@@ -3,7 +3,7 @@ using UnityEngine;
 public class CustomerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float speed = 2f;
+    public float speed = 3f;
     public float stopDistance = 0.1f; // small distance for target reach
 
     private Transform targetTransform = null;

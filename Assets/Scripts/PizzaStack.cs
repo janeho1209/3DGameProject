@@ -59,7 +59,7 @@ public class PizzaStack : MonoBehaviour
         }
 
         // NEW: Mark as completed pizza when it has cheese (minimum viable pizza)
-        if (hasCheese && !gameObject.CompareTag("CompletedPizza"))
+        if (hasDough && !gameObject.CompareTag("CompletedPizza"))
         {
             gameObject.tag = "CompletedPizza";
             Debug.Log("Pizza is ready to be picked up!");
