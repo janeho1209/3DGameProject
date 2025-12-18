@@ -171,7 +171,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68916603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -229,11 +229,12 @@ Transform:
   m_GameObject: {fileID: 68916603}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -7.38}
+  m_LocalPosition: {x: 0, y: 0, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 883304572}
+  - {fileID: 835536725}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &68916608
@@ -250,6 +251,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   moveSpeed: 5
   cameraTransform: {fileID: 0}
+  acceleration: 10
+  deceleration: 15
+  turnSpeed: 10
 --- !u!54 &68916609
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -291,6 +295,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickUp
   inHand: {fileID: 883304572}
   pickupKey: 120
+  deliverKey: 99
+  frontCounterSpace: {fileID: 0}
 --- !u!1 &89794514
 GameObject:
   m_ObjectHideFlags: 0
@@ -999,6 +1005,9 @@ MonoBehaviour:
   mouseSensitivity: 3
   minPitch: -30
   maxPitch: 60
+  mouseSmoothing: 8
+  swayAmount: 2
+  swaySmoothness: 6
 --- !u!1 &390613724
 GameObject:
   m_ObjectHideFlags: 0
@@ -1495,6 +1504,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &835536724
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 68916607}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+      propertyPath: m_Name
+      value: polyrat
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+--- !u!4 &835536725 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 21b82afbbc40613449fc83b0e4597542, type: 3}
+  m_PrefabInstance: {fileID: 835536724}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &883304571
 GameObject:
   m_ObjectHideFlags: 0
@@ -1690,9 +1761,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf69a686ebc814d4c85078e413bc6bfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerSpawner
+  customerPrefabs: []
   customerPrefab: {fileID: 2858565104403254181, guid: 773e2fda8a7559e49b42a567e9390eec, type: 3}
   spawnPoint: {fileID: 89794515}
   customerTarget: {fileID: 390613725}
+  spawnInterval: 4
+  maxCustomers: 3
 --- !u!4 &1211735923
 Transform:
   m_ObjectHideFlags: 0
