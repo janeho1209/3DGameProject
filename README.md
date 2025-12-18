@@ -7,6 +7,13 @@ After the order has been made, the player must pickup the pizza and hand it to t
 The goal is to complete as many orders correctly to maintain a high store rating by the end of the level. Too many failed orders/very low
 rating will result in a game over. 
 
+## How to Play
+- WASD to move around
+- X to pickup/drop ingredients
+   - Grab the pizza crust and place it at the front counter
+   - Then grab the respective ingredients that match the customer's order
+- C to deliver pizza to customer
+
 ## Gameplay Loop
 ```
 Start Game
