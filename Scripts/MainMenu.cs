@@ -6,7 +6,7 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] private GameObject backgroundDimmer;
 
     public void PlayGame() {
-        SceneManager.LoadScene("Kitchen");
+        SceneManager.LoadScene("current iteration");
     }
 
     public void QuitGame() {
